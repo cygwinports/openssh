@@ -1,0 +1,165 @@
+--- openssh-5.2p1-10/src/openssh-5.2p1/contrib/cygwin/ssh-host-config	2009-01-29 14:40:30.000000000 -0600
++++ openssh-5.2p1-4/contrib/cygwin/ssh-host-config	2009-07-06 03:55:13.000000000 -0500
+@@ -1,6 +1,6 @@
+ #!/bin/bash
+ #
+-# ssh-host-config, Copyright 2000, 2001, 2002, 2003 Red Hat Inc.
++# ssh-host-config, Copyright 2000-2009 Red Hat Inc.
+ #
+ # This file is part of the Cygwin port of OpenSSH.
+ 
+@@ -26,7 +26,9 @@
+ privsep_configured=no
+ privsep_used=yes
+ cygwin_value=""
++user_account=
+ password_value=
++opt_force=no
+ 
+ # ======================================================================
+ # Routine: create_host_keys
+@@ -287,6 +289,11 @@
+ 	  csih_inform "sshd requires.  You need to have or to create a privileged"
+ 	  csih_inform "account.  This script will help you do so."
+ 	  echo
++
++	  [ "${opt_force}" = "yes" ] && opt_f=-f
++	  [ -n "${user_account}" ] && opt_u="-u ""${user_account}"""
++	  csih_select_privileged_username ${opt_f} ${opt_u} sshd
++
+ 	  if ! csih_create_privileged_user "${password_value}"
+ 	  then
+ 	    csih_error_recoverable "There was a serious problem creating a privileged user."
+@@ -316,12 +323,12 @@
+ 
+ 	if [ -n "${csih_cygenv}" ]
+ 	then
+-	  cygwin_env="-e CYGWIN=\"${csih_cygenv}\""
++	  cygwin_env=( -e "CYGWIN=${csih_cygenv}" )
+ 	fi
+ 	if [ -z "${password}" ]
+ 	then
+-	  if eval cygrunsrv -I sshd -d \"CYGWIN sshd\" -p /usr/sbin/sshd \
+-			    -a "-D" -y tcpip ${cygwin_env}
++	  if cygrunsrv -I sshd -d "CYGWIN sshd" -p /usr/sbin/sshd \
++			    -a "-D" -y tcpip "${cygwin_env[@]}"
+ 	  then
+ 	    echo
+ 	    csih_inform "The sshd service has been installed under the LocalSystem"
+@@ -330,8 +337,8 @@
+ 	    csih_inform "will start automatically after the next reboot."
+ 	  fi
+ 	else
+-	  if eval cygrunsrv -I sshd -d \"CYGWIN sshd\" -p /usr/sbin/sshd \
+-			    -a "-D" -y tcpip ${cygwin_env} \
++	  if cygrunsrv -I sshd -d "CYGWIN sshd" -p /usr/sbin/sshd \
++			    -a "-D" -y tcpip "${cygwin_env[@]}" \
+ 			    -u "${run_service_as}" -w "${password}"
+ 	  then
+ 	    echo
+@@ -378,11 +385,13 @@
+ then
+   csih_auto_answer="no"
+   csih_disable_color
++  opt_force=yes
+ fi
+ if [ -n "${SSH_HOST_CONFIG_AUTO_ANSWER_NO}" ]
+ then
+   csih_auto_answer="no"
+   csih_disable_color
++  opt_force=yes
+ fi
+ 
+ # ======================================================================
+@@ -407,10 +416,12 @@
+ 
+   -y | --yes )
+     csih_auto_answer=yes
++    opt_force=yes
+     ;;
+ 
+   -n | --no )
+     csih_auto_answer=no
++    opt_force=yes
+     ;;
+ 
+   -c | --cygwin )
+@@ -423,6 +434,11 @@
+     shift
+     ;;
+ 
++  -u | --user )
++    user_account="$1"
++    shift
++    ;;
++    
+   -w | --pwd )
+     password_value="$1"
+     shift
+@@ -443,6 +459,7 @@
+     echo "  --no     -n            Answer all questions with \"no\" automatically."
+     echo "  --cygwin -c <options>  Use \"options\" as value for CYGWIN environment var."
+     echo "  --port   -p <n>        sshd listens on port n."
++    echo "  --user   -u <account>  privileged user for service."
+     echo "  --pwd    -w <passwd>   Use \"pwd\" as password for privileged user."
+     echo "  --privileged           On Windows NT/2k/XP, require privileged user"
+     echo "                         instead of LocalSystem for sshd service."
+@@ -489,7 +506,7 @@
+ fi
+ 
+ # Create /var/empty file used as chroot jail for privilege separation
+-csih_make_dir "${LOCALSTATEDIR}/empty" "Cannot create log directory."
++csih_make_dir "${LOCALSTATEDIR}/empty" "Cannot create ${LOCALSTATEDIR}/empty directory."
+ chmod 755 "${LOCALSTATEDIR}/empty"
+ setfacl -m u:system:rwx "${LOCALSTATEDIR}/empty"
+ 
+--- openssh-5.2p1-10/src/openssh-5.2p1/contrib/cygwin/ssh-user-config	2008-07-13 21:12:54.000000000 -0500
++++ openssh-5.2p1-4/contrib/cygwin/ssh-user-config	2009-07-29 03:40:48.000000000 -0500
+@@ -1,8 +1,20 @@
+ #!/bin/bash
+ #
+-# ssh-user-config, Copyright 2000, 2001, 2002, 2003, Red Hat Inc.
++# ssh-user-config, Copyright 2000-2008 Red Hat Inc.
+ #
+ # This file is part of the Cygwin port of OpenSSH.
++#
++# Permission to use, copy, modify, and distribute this software for any
++# purpose with or without fee is hereby granted, provided that the above
++# copyright notice and this permission notice appear in all copies.
++#
++# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  
++# OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF               
++# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.   
++# IN NO EVENT SHALL THE ABOVE COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,   
++# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR    
++# OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR    
++# THE USE OR OTHER DEALINGS IN THE SOFTWARE.                               
+ 
+ # ======================================================================
+ # Initialization
+@@ -118,14 +130,14 @@
+   pwdhome=$(awk -F: '{ if ( $3 == '${uid}' ) print $6; }' < ${SYSCONFDIR}/passwd)
+   if [ "X${pwdhome}" = "X" ]
+   then
+-    csih_error_multiline \
++    csih_error_multi \
+       "There is no home directory set for you in ${SYSCONFDIR}/passwd." \
+       'Setting $HOME is not sufficient!'
+   fi
+   
+   if [ ! -d "${pwdhome}" ]
+   then
+-    csih_error_multiline \
++    csih_error_multi \
+       "${pwdhome} is set in ${SYSCONFDIR}/passwd as your home directory" \
+       'but it is not a valid directory. Cannot create user identity files.'
+   fi
+@@ -291,7 +303,7 @@
+ # Check passwd file
+ if [ ! -f ${SYSCONFDIR}/passwd ]
+ then
+-  csih_error_multiline \
++  csih_error_multi \
+     "${SYSCONFDIR}/passwd is nonexistant. Please generate an ${SYSCONFDIR}/passwd file" \
+     'first using mkpasswd. Check if it contains an entry for you and' \
+     'please care for the home directory in your entry as well.'

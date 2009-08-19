@@ -1,0 +1,22 @@
+DESCRIPTION="The OpenSSH secure shell server and client programs"
+HOMEPAGE="http://www.openssh.com/"
+SRC_URI="ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/${P}.tar.gz
+         ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/${P}.tar.gz.asc"
+PATCH_URI="5.2p1-csih-update.patch"
+
+CYGCONF_ARGS="
+	--libexecdir=/usr/sbin
+	--with-kerberos5=/usr
+	--with-tcp-wrappers
+	--without-libedit
+	--without-pam
+	--without-selinux
+"
+
+src_install() {
+	cd ${B}
+	cyginstall
+
+	cd ${S}/contrib/cygwin
+	cygmake cygwin-postinstall DESTDIR=${D}
+}
