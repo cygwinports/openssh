@@ -1,0 +1,45 @@
+--- origsrc/openssh-5.9p1/auth-passwd.c	2009-03-07 18:40:28.000000000 -0600
++++ src/openssh-5.9p1/auth-passwd.c	2012-03-18 23:20:04.517597400 -0500
+@@ -44,6 +44,9 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <stdarg.h>
++#ifdef HAVE_CYGWIN
++#include <windows.h>
++#endif
+ 
+ #include "packet.h"
+ #include "buffer.h"
+--- origsrc/openssh-5.9p1/contrib/cygwin/Makefile	2010-04-08 22:35:24.000000000 -0500
++++ src/openssh-5.9p1/contrib/cygwin/Makefile	2012-03-18 23:25:12.971544500 -0500
+@@ -50,7 +50,6 @@ install-sshdoc:
+ 	$(INSTALL) -m 644 $(srcdir)/README.privsep $(DESTDIR)$(sshdocdir)/README.privsep
+ 	$(INSTALL) -m 644 $(srcdir)/README.tun $(DESTDIR)$(sshdocdir)/README.tun
+ 	$(INSTALL) -m 644 $(srcdir)/TODO $(DESTDIR)$(sshdocdir)/TODO
+-	$(INSTALL) -m 644 $(srcdir)/WARNING.RNG $(DESTDIR)$(sshdocdir)/WARNING.RNG
+ 
+ install-cygwindoc: README
+ 	$(srcdir)/mkinstalldirs $(DESTDIR)$(cygdocdir)
+--- origsrc/openssh-5.9p1/openbsd-compat/bsd-cygwin_util.h	2011-08-16 20:31:09.000000000 -0500
++++ src/openssh-5.9p1/openbsd-compat/bsd-cygwin_util.h	2012-03-18 23:22:01.498432000 -0500
+@@ -36,7 +36,6 @@
+ 
+ #undef ERROR
+ 
+-#include <windows.h>
+ #include <sys/cygwin.h>
+ #include <io.h>
+ 
+--- origsrc/openssh-5.9p1/session.c	2011-05-19 20:23:10.000000000 -0500
++++ src/openssh-5.9p1/session.c	2012-03-18 23:21:16.125888700 -0500
+@@ -96,6 +96,10 @@
+ #include <kafs.h>
+ #endif
+ 
++#ifdef HAVE_CYGWIN
++#include <windows.h>
++#endif
++
+ #ifdef WITH_SELINUX
+ #include <selinux/selinux.h>
+ #endif

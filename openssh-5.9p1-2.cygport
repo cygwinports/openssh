@@ -2,20 +2,32 @@ DESCRIPTION="The OpenSSH secure shell server and client programs"
 HOMEPAGE="http://www.openssh.com/"
 SRC_URI="ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/${P}.tar.gz
          ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/${P}.tar.gz.asc"
-PATCH_URI="5.2p1-csih-update.patch"
 
-CYGCONF_ARGS="
-	--libexecdir=/usr/sbin
-	--with-kerberos5=/usr
-	--with-tcp-wrappers
-	--without-libedit
-	--without-pam
-	--without-selinux
-"
+src_compile() {
+	cd ${S}
+#	cygautoreconf
+
+	cd ${S}/contrib
+	cygmake gnome-ssh-askpass2
+
+	cd ${B}
+	cygconf \
+		--libexecdir=/usr/sbin \
+		--with-kerberos5=/usr \
+		--with-tcp-wrappers \
+		--with-libedit \
+		--without-pam \
+		--without-selinux
+	cygmake
+}
 
 src_install() {
 	cd ${B}
 	cyginstall
+
+	cd ${S}/contrib
+	exeinto /usr/lib/ssh
+	newexe gnome-ssh-askpass2.exe gnome-ssh-askpass.exe
 
 	cd ${S}/contrib/cygwin
 	cygmake cygwin-postinstall DESTDIR=${D}
