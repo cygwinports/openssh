@@ -2,6 +2,7 @@ DESCRIPTION="The OpenSSH secure shell server and client programs"
 HOMEPAGE="http://www.openssh.com/"
 SRC_URI="ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/${P}.tar.gz
          ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/${P}.tar.gz.asc"
+PATCH_URI="5.9p1-cygwin.patch"
 
 src_compile() {
 	cd ${S}
