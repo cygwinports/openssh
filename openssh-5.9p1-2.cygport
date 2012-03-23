@@ -5,30 +5,18 @@ SRC_URI="ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/${P}.tar.gz
 PATCH_URI="5.9p1-cygwin.patch"
 
 src_compile() {
-	cd ${S}
-#	cygautoreconf
-
-	cd ${S}/contrib
-	cygmake gnome-ssh-askpass2
-
 	cd ${B}
 	cygconf \
 		--libexecdir=/usr/sbin \
 		--with-kerberos5=/usr \
 		--with-tcp-wrappers \
-		--with-libedit \
-		--without-pam \
-		--without-selinux
+		--with-libedit
 	cygmake
 }
 
 src_install() {
 	cd ${B}
 	cyginstall
-
-	cd ${S}/contrib
-	exeinto /usr/lib/ssh
-	newexe gnome-ssh-askpass2.exe gnome-ssh-askpass.exe
 
 	cd ${S}/contrib/cygwin
 	cygmake cygwin-postinstall DESTDIR=${D}
