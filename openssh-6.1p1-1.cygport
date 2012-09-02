@@ -1,16 +1,23 @@
-DESCRIPTION="The OpenSSH secure shell server and client programs"
+CATEGORY="Net"
+SUMMARY="Secure shell server and client programs"
+DESCRIPTION="OpenSSH is a program for logging into a remote machine and for
+executing commands on a remote machine.  It can replace rlogin and rsh,
+providing encrypted communication between two machines."
 HOMEPAGE="http://www.openssh.com/"
 SRC_URI="ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/${P}.tar.gz
          ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/${P}.tar.gz.asc"
-PATCH_URI="5.9p1-cygwin.patch"
+
+REQUIRES="csih cygrunsrv diffutils editrights gawk"
 
 src_compile() {
 	cd ${B}
 	cygconf \
 		--libexecdir=/usr/sbin \
+		--disable-strip \
 		--with-kerberos5=/usr \
 		--with-tcp-wrappers \
-		--with-libedit
+		--with-libedit \
+		--without-pam
 	cygmake
 }
 
