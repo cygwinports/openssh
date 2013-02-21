@@ -1,3 +1,6 @@
+NAME="openssh"
+VERSION=6.1p1
+RELEASE=1
 CATEGORY="Net"
 SUMMARY="Secure shell server and client programs"
 DESCRIPTION="OpenSSH is a program for logging into a remote machine and for
@@ -6,17 +9,17 @@ providing encrypted communication between two machines."
 HOMEPAGE="http://www.openssh.com/"
 SRC_URI="ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/${P}.tar.gz
          ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/${P}.tar.gz.asc"
+PATCH_URI="01-cygwin-textreadmode.patch"
 
 REQUIRES="csih cygrunsrv diffutils editrights gawk"
 
 src_compile() {
+	cd ${S}
+	cygautoreconf
 	cd ${B}
 	cygconf \
 		--libexecdir=/usr/sbin \
 		--disable-strip \
-		--with-kerberos5=/usr \
-		--with-tcp-wrappers \
-		--with-libedit \
 		--without-pam
 	cygmake
 }
