@@ -1,0 +1,11 @@
+--- origsrc/openssh-6.1p1/configure.ac	2012-07-05 20:49:29.000000000 -0500
++++ src/openssh-6.1p1/configure.ac	2013-02-26 05:50:14.962168200 -0600
+@@ -496,7 +496,7 @@ case "$host" in
+ 	;;
+ *-*-cygwin*)
+ 	check_for_libcrypt_later=1
+-	LIBS="$LIBS /usr/lib/textreadmode.o"
++	LIBS="$LIBS -ltextreadmode"
+ 	AC_DEFINE([HAVE_CYGWIN], [1], [Define if you are on Cygwin])
+ 	AC_DEFINE([USE_PIPES], [1], [Use PIPES instead of a socketpair()])
+ 	AC_DEFINE([DISABLE_SHADOW], [1],
