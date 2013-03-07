@@ -9,7 +9,8 @@ providing encrypted communication between two machines."
 HOMEPAGE="http://www.openssh.com/"
 SRC_URI="ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/${P}.tar.gz
          ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/${P}.tar.gz.asc"
-PATCH_URI="01-cygwin-textreadmode.patch"
+PATCH_URI="01-cygwin-textreadmode.patch
+           02-cygwin-w64.patch"
 
 REQUIRES="csih cygrunsrv diffutils editrights gawk"
 
