@@ -1,6 +1,6 @@
 NAME="openssh"
 VERSION=6.6.1p1
-RELEASE=2
+RELEASE=3
 CATEGORY="Net"
 SUMMARY="Secure shell server and client programs"
 DESCRIPTION="OpenSSH is a program for logging into a remote machine and for
