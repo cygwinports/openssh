@@ -1,5 +1,5 @@
 NAME="openssh"
-VERSION=6.9p1
+VERSION=7.1p1
 RELEASE=1
 CATEGORY="Net"
 SUMMARY="Secure shell server and client programs"
