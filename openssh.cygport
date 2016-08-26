@@ -1,5 +1,5 @@
 NAME="openssh"
-VERSION=7.1p1
+VERSION=7.3p1
 RELEASE=1
 CATEGORY="Net"
 SUMMARY="Secure shell server and client programs"
@@ -8,10 +8,9 @@ executing commands on a remote machine.  It can replace rlogin and rsh,
 providing encrypted communication between two machines."
 HOMEPAGE="http://www.openssh.com/"
 BASE_VERSION=${VERSION}
-SRC_URI="ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${BASE_VERSION}.tar.gz
-         ftp://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${BASE_VERSION}.tar.gz.asc"
+SRC_URI="http://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${BASE_VERSION}.tar.gz
+         http://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${BASE_VERSION}.tar.gz.asc"
 SRC_DIR="openssh-${BASE_VERSION}"
-PATCH_URI="https://raw.githubusercontent.com/Jakuje/stuff/master/openssh_without_fdpass.patch"
 
 REQUIRES="csih cygrunsrv diffutils editrights gawk"
 
@@ -32,6 +31,10 @@ src_compile() {
 src_install() {
 	cd ${B}
 	cyginstall
+
+	# starting with 7.2p1, slogin aliases are not created
+	dosym ssh.exe /usr/bin/slogin
+	dosym ssh.1 /usr/share/man/man1/slogin.1
 
 	cd ${S}/contrib/cygwin
 	cygmake cygwin-postinstall DESTDIR=${D}
