@@ -1,6 +1,6 @@
 NAME="openssh"
 VERSION=7.3p1
-RELEASE=1
+RELEASE=2
 CATEGORY="Net"
 SUMMARY="Secure shell server and client programs"
 DESCRIPTION="OpenSSH is a program for logging into a remote machine and for
@@ -11,6 +11,7 @@ BASE_VERSION=${VERSION}
 SRC_URI="http://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${BASE_VERSION}.tar.gz
          http://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${BASE_VERSION}.tar.gz.asc"
 SRC_DIR="openssh-${BASE_VERSION}"
+PATCH_URI="7.3p1-getsockopt.patch"
 
 REQUIRES="csih cygrunsrv diffutils editrights gawk"
 
